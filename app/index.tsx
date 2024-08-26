@@ -1,6 +1,7 @@
 import { Redirect } from 'expo-router';
 import React, { useState, useEffect } from 'react';
 import { View, Text, Animated, StyleSheet } from 'react-native';
+import { useAuth } from '@clerk/clerk-expo'
 
 const PreLoader = ({ onAnimationEnd }: any) => {
   const [loading, setLoading] = useState(true);
@@ -44,6 +45,12 @@ const PreLoader = ({ onAnimationEnd }: any) => {
 
 const Home = () => {
   const [isLoading, setIsLoading] = useState(true);
+
+  const { isSignedIn } = useAuth()
+
+  if (isSignedIn) {
+    return <Redirect href={'/(root)/(tabs)/home'} />
+  }
 
   const handleAnimationEnd = () => {
     setIsLoading(false);

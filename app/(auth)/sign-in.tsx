@@ -57,7 +57,7 @@ const SignIn = () => {
             <Text className='text-primary-500'>Sign up</Text>
           </Link>
         </View>
-
+  
       </View>
     </ScrollView>
   )
