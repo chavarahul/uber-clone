@@ -1,21 +1,39 @@
-import { View, Text, ScrollView, Image } from 'react-native'
-import React, { useState } from 'react'
+import { View, Text, ScrollView, Image, Alert } from 'react-native'
+import React, { useCallback, useState } from 'react'
 import { icons, images } from '../../constants/index'
 import InputFeild from '../../components/InputFeild'
 import CustomButton from '../../components/CustomButton'
-import { Link } from 'expo-router'
+import { Link, router } from 'expo-router'
 import OAuth from '../../components/OAuth'
+import { useSignIn } from '@clerk/clerk-expo'
 
 const SignIn = () => {
+
+  const { isLoaded, signIn, setActive } = useSignIn();
 
   const [form, setForm] = useState({
     email: '',
     password: ''
   })
 
-  const onSignInPress = async () => {
+  const onSignInPress = useCallback(async () => {
+    if (!isLoaded) return;
+    try {
+      const signInAttempt = await signIn.create({
+        identifier: form.email,
+        password: form.password,
+      })
+      if (signInAttempt.status === 'complete') {
+        await setActive({ session: signInAttempt.createdSessionId });
+        router.replace('/(root)/(tabs)/home');
+      } else {
+        Alert.alert("Error", "Log in failed. Please try again.");
 
-  }
+      }
+    } catch (error: any) {
+      Alert.alert('Error', error.errors[0].longMessage)
+    }
+  }, [isLoaded, form])
   return (
     <ScrollView className='flex-1 bg-white'>
       <View className='flex-1 bg-white'>
@@ -57,7 +75,7 @@ const SignIn = () => {
             <Text className='text-primary-500'>Sign up</Text>
           </Link>
         </View>
-  
+
       </View>
     </ScrollView>
   )
